@@ -9,6 +9,16 @@ import (
 	"context"
 )
 
+const deleteXpBonusForCharacter = `-- name: DeleteXpBonusForCharacter :exec
+DELETE FROM xp_bonus_reasons
+WHERE character_id = ?
+`
+
+func (q *Queries) DeleteXpBonusForCharacter(ctx context.Context, characterID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteXpBonusForCharacter, characterID)
+	return err
+}
+
 const getXpBonusForCharacter = `-- name: GetXpBonusForCharacter :many
 SELECT id, xp_bonus, reason, character_id, create_datetime FROM xp_bonus_reasons
 WHERE character_id = ?

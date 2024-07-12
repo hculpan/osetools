@@ -67,17 +67,15 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/characters/"+id, http.StatusSeeOther)
 	}
 
-	if totalXp > 0 {
-		_, err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
-			XpAward:          int64(totalXp),
-			XpAwardWithBonus: int64(totalXp),
-			Reason:           "Initial",
-			CharacterID:      dbCharacter.ID,
-		})
-		if err != nil {
-			slog.Error("error persisting character", "msg", err.Error())
-			http.Redirect(w, r, "/characters/"+id, http.StatusSeeOther)
-		}
+	_, err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
+		XpAward:          int64(totalXp),
+		XpAwardWithBonus: int64(totalXp),
+		Reason:           "Initial",
+		CharacterID:      dbCharacter.ID,
+	})
+	if err != nil {
+		slog.Error("error persisting character", "msg", err.Error())
+		http.Redirect(w, r, "/characters/"+id, http.StatusSeeOther)
 	}
 
 	for _, e := range xpBonusEntries {

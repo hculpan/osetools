@@ -26,6 +26,7 @@ func routes(router *chi.Mux) *chi.Mux {
 		router.Get("/gold-for-xp/{campaignId}", auth.AuthMiddleware(handlers.GoldForXpHandler))
 		router.Get("/add-character/{campaignId}", auth.AuthMiddleware(handlers.AddCharacterFormHandler))
 		router.Post("/add-character", auth.AuthMiddleware(handlers.AddCharacterPostHandler))
+		router.Get("/deletecharacter/{characterId}", auth.AuthMiddleware(handlers.DeleteCharacterHandler))
 
 		// Serve static files
 		fileServer := http.FileServer(http.Dir("./static"))

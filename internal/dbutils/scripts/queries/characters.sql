@@ -25,3 +25,6 @@ GROUP BY characters.id;
 -- name: GetCharacterById :one
 SELECT * FROM characters
 where id = ? LIMIT 1;
+
+-- name: DeleteCharacter :exec
+DELETE FROM characters where id = ?;

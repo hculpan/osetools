@@ -10,6 +10,15 @@ import (
 	"database/sql"
 )
 
+const deleteCharacter = `-- name: DeleteCharacter :exec
+DELETE FROM characters where id = ?
+`
+
+func (q *Queries) DeleteCharacter(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteCharacter, id)
+	return err
+}
+
 const getCharacterById = `-- name: GetCharacterById :one
 SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime FROM characters
 where id = ? LIMIT 1
