@@ -1,0 +1,34 @@
+package templates
+
+import (
+"github.com/hculpan/osetools/cmd/web/templates/components"
+"github.com/hculpan/osetools/internal/db"
+)
+
+templ AccountTemplate(appTitle string, user db.User) {
+<!DOCTYPE html>
+<html lang="en">
+
+@components.Head(appTitle)
+
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        @components.Sidebar("Account", user.Username, false)
+
+        <!-- Page content below -->
+
+        <div class="container mt-5">
+            <h1>Account: { user.Username }</h1>
+            <ul>
+                <li>
+                    Name: { user.Realname.String }
+                </li>
+            </ul>
+            <p class="lead">Here you can set account preferences, though right now there aren't any.</p>
+        </div>
+    </div>
+</body>
+
+</html>
+
+}

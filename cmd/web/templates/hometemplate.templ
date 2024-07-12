@@ -1,0 +1,26 @@
+package templates
+
+import "github.com/hculpan/osetools/cmd/web/templates/components"
+
+templ HomeTemplate(appTitle string, username string, authorized bool) {
+<!DOCTYPE html>
+<html lang="en">
+
+@components.Head(appTitle)
+
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        @components.Sidebar("Home", username, authorized)
+        <div class="container mt-5">
+            <h1>Welcome!</h1>
+            <p class="lead">Congratulations, you have successfully logged in to our application.</p>
+            <div>
+                <a href="/logout" class="btn button">Logout</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+}

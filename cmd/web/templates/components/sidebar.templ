@@ -1,0 +1,39 @@
+package components
+
+templ Sidebar(active string, username string, authorized bool) {
+<nav class="sidebar flex-shrink-0 p-3 border-end border-1 border-light"
+    style="width: 280px; height: 100vh; background-color: #181818;">
+    <div class="d-flex justify-content-center mb-4">
+        <a href="/home">
+            <img src="/static/img/logo-225x225.png" class="mx-auto" width="100%" height="100%" />
+        </a>
+    </div>
+    if authorized {
+    <ul class="nav nav-pills flex-column">
+        <li class="nav-anchor-item">
+            if active == "Account" {
+            <a class="nav-anchor-active" href="/account">{ username }</a>
+            } else {
+            <a class="nav-anchor" href="/account">{ username }</a>
+            }
+        </li>
+        <li class="nav-anchor-item">
+            if active == "Campaigns" {
+            <a class="nav-anchor-active" href="/campaigns">Campaigns</a>
+            } else {
+            <a class="nav-anchor" href="/campaigns">Campaigns</a>
+            }
+        </li>
+        <li class="nav-anchor-item mt-4">
+            <a class="nav-anchor" href="/logout">Logout</a>
+        </li>
+    </ul>
+    } else {
+            <ul class="nav nav-pills flex-column">
+        <li class="nav-anchor-item">
+            <a class="nav-anchor" href="/login">Login</a>
+        </li>
+</ul>
+    }
+</nav>
+}

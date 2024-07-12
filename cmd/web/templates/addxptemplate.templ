@@ -1,0 +1,117 @@
+package templates
+
+import (
+"strconv"
+"github.com/hculpan/osetools/internal/db"
+"github.com/hculpan/osetools/cmd/web/templates/components"
+)
+
+templ AddXpTemplate(appTitle string, username string, characters []db.Character) {
+<!DOCTYPE html>
+<html lang="en">
+
+@components.Head(appTitle)
+
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        @components.Sidebar("Campaigns", username, false)
+        <div class="container mt-5">
+            <h1>Add XP</h1>
+            <form method="POST" action="/add-xp">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" scope="col">Selected</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Player</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center"><input class="form-check-input" type="checkbox" value=""
+                                                id="masterCheckbox" /> Select All</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    for _, c := range characters {
+                                    <tr>
+                                        <td class="text-center">
+                                            <input class="form-check-input childCheckbox" type="checkbox" value={
+                                                strconv.Itoa(int(c.ID)) } name="selectedIds[]" />
+                                        </td>
+                                        <td>{ c.Name }</td>
+                                        <td>{ c.PlayerName }</td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="xpAmount" class="form-label">XP Amount</label>
+                                <input type="number" id="xpAmount" name="xpAmount" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Reason</label>
+                                <input type="text" id="reason" name="reason" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col">
+                            <button type="submit" class="btn button" id="addXpButton" disabled>Add XP</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script lang="javascript">
+        document.getElementById('masterCheckbox').addEventListener('change', function () {
+            var isChecked = this.checked;
+            var childCheckboxes = document.querySelectorAll('.childCheckbox');
+
+            childCheckboxes.forEach(function (checkbox) {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAllCheckbox = document.getElementById('masterCheckbox');
+            const checkboxes = document.querySelectorAll('.childCheckbox');
+            const submitBtn = document.getElementById('addXpButton');
+
+            const toggleSubmitButtonState = () => {
+                // Check if any of the item checkboxes are checked
+                const isAnyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                // Enable submit button if any checkbox is checked, otherwise disable
+                submitBtn.disabled = !isAnyCheckboxChecked;
+            };
+
+            // Event listener for the "Select All" checkbox
+            selectAllCheckbox.addEventListener('change', function () {
+                // Check/uncheck all item checkboxes to match the "Select All" state
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                // Update submit button state
+                toggleSubmitButtonState();
+            });
+
+            // Event listeners for the dynamically created checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', toggleSubmitButtonState);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+
+}

@@ -1,3 +1,8 @@
+osetools
+osetools-cli
+osetools.linux
+osetools-cli.linux
+
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
@@ -7,6 +12,11 @@
 *.dll
 *.so
 *.dylib
+db_data
+tmp
+.env
+.DS_Store
+sql_setup_commands.txt
 
 # Test binary, built with `go test -c`
 *.test

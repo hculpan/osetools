@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "internal/dbutils/scripts/queries"
+    schema: "internal/dbutils/scripts/schema.sql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/db"

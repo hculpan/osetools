@@ -1,0 +1,77 @@
+package templates
+
+import (
+"strconv"
+"github.com/hculpan/osetools/cmd/web/templates/components"
+"github.com/hculpan/osetools/internal/db"
+"github.com/hculpan/osetools/internal/utils"
+)
+
+templ XpTemplate(appTitle string, username string, characters []db.GetCharactersForCampaignWithXpRow, authorized bool,
+msg string) {
+<!DOCTYPE html>
+<html lang="en">
+
+@components.Head(appTitle)
+
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        @components.Sidebar("Characters", username, authorized)
+
+        <div class="container mt-5">
+            <h1>Characters</h1>
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Player</th>
+                        <th class="text-center" scope="col">XP Bonus</th>
+                        <th class="text-center" scope="col">Total XP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    for _, c := range characters {
+                    <tr>
+                        <td><a href={ templ.SafeURL("/character/" + strconv.Itoa(int(c.ID))) }>{ c.Name }</a></td>
+                        <td>{ c.PlayerName }</td>
+                        <td class=" text-center">{ utils.FormatInt(int(c.XpBonus)) }%</td>
+                        if c.TotalXp.Valid {
+                        <td class=" text-center">{ utils.FormatInt(int(c.TotalXp.Float64)) }</td>
+                        } else {
+                        <td class=" text-center">Unknown</td>
+                        }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            if len(characters) == 0 {
+            <div class="text-center">
+                <button class="btn button" href="" disabled>Add XP</button>
+            </div>
+            } else if authorized {
+            <div class="text-center">
+                <a class="btn button" href={ templ.SafeURL("/add-xp/" + strconv.Itoa(int(characters[0].CampaignID)))
+                    }>Add XP</a>
+                <a class="btn button" href={ templ.SafeURL("/gold-for-xp/" +
+                    strconv.Itoa(int(characters[0].CampaignID))) }>Gold for XP</a>
+                <a class="btn button" href={ templ.SafeURL("/add-character/" +
+                    strconv.Itoa(int(characters[0].CampaignID))) }>Add Character</a>
+            </div>
+            }
+            switch msg {
+            case "xp_awarded":
+            <div class="text-center text-success mt-4">XP has been successfully awarded</div>
+            }
+        </div>
+    </div>
+</body>
+
+</html>
+
+}

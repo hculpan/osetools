@@ -1,0 +1,44 @@
+package templates
+
+import (
+"strconv"
+"github.com/hculpan/osetools/cmd/web/templates/components"
+"github.com/hculpan/osetools/internal/db"
+)
+
+templ CampaignsTemplate(appTitle string, username string, campaigns []db.GetCampaignsWithCharacterCountRow) {
+<!DOCTYPE html>
+<html lang="en">
+
+@components.Head(appTitle)
+
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        @components.Sidebar("Campaigns", username, false)
+        <div class="container mt-5">
+            <h1>Campaigns</h1>
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th class="text-center" scope="col"># Characters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    for _, c := range campaigns {
+                    <tr>
+                        <td><a href={ templ.SafeURL("/characters/" + strconv.Itoa(int(c.ID))) }>{ c.Name }</a></td>
+                        <td>{ c.Description.String }</td>
+                        <td class=" text-center">{ strconv.Itoa(int(c.CharacterCount)) }</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
+
+}

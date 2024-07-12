@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #c9a678; /* Light gold text color for contrast */
+  background-color: #202020; /* Dark background */
+}
+
+/* Header */
+header {
+  background-color: #333333; /* Slightly lighter dark shade for the header */
+  color: #ffffff;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 24px;
+}
+
+/* Navigation */
+nav ul {
+  list-style: none;
+  text-align: center;
+  padding: 10px 0;
+}
+
+nav ul li {
+  display: inline;
+  margin: 0 15px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+/* Main Content */
+main {
+  padding: 20px;
+  background-color: #2a2a2a; /* Very dark gray for the main content area, for contrast with the body */
+  margin: 20px auto;
+  width: 90%;
+  max-width: 800px;
+}
+
+/* Footer */
+footer {
+  background-color: #333333;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Buttons and Links */
+button, .button {
+  background-color: #5a4a42; /* Earthy tone for buttons */
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-anchor-item {
+  padding-bottom: 10px;
+}
+
+.nav-anchor {
+  color: #c9a678; /* Gold color for links */
+}
+
+.nav-anchor-active {
+  color: #a8d0e6;
+}
+
+a:hover, button:hover, .button:hover {
+  color: #c9a678; /* Gold color for links */
+  opacity: 0.8;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
