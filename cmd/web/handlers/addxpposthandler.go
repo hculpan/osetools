@@ -19,6 +19,8 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	campaignId := r.FormValue("campaignId")
+
 	charIds := r.Form["selectedIds[]"]
 	xpAmount := r.FormValue("xpAmount")
 	xpAward, err := strconv.Atoi(xpAmount)
@@ -64,5 +66,5 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect to the welcome page upon successful login
-	http.Redirect(w, r, "/characters/1?msg=xp_awarded", http.StatusSeeOther)
+	http.Redirect(w, r, "/characters/"+campaignId+"?msg=xp_awarded", http.StatusSeeOther)
 }

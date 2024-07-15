@@ -11,6 +11,8 @@ import (
 )
 
 func CampaignsHandler(w http.ResponseWriter, r *http.Request) {
+	authorized := auth.IsAuthorized(r)
+
 	user, err := dbutils.GetQueries().GetUser(r.Context(), auth.GetCurrentUsername(r))
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to load user: %w", err).Error())
@@ -23,6 +25,6 @@ func CampaignsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comp := templates.CampaignsTemplate(appTitle, user.Username, campaigns)
+	comp := templates.CampaignsTemplate(appTitle, user.Username, campaigns, authorized)
 	comp.Render(r.Context(), w)
 }

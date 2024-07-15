@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func CampaignsTemplate(appTitle string, username string, campaigns []db.GetCampaignsWithCharacterCountRow) templ.Component {
+func CampaignsTemplate(appTitle string, username string, campaigns []db.GetCampaignsWithCharacterCountRow, authorized bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -44,7 +44,7 @@ func CampaignsTemplate(appTitle string, username string, campaigns []db.GetCampa
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Sidebar("Campaigns", username, false).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Sidebar("Campaigns", username, authorized).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +106,7 @@ func CampaignsTemplate(appTitle string, username string, campaigns []db.GetCampa
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tbody></table></div></div></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tbody></table><a class=\"btn btn-primary\" href=\"/add-campaign\">New Campaign</a></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

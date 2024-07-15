@@ -18,6 +18,7 @@ templ AddXpTemplate(appTitle string, username string, characters []db.Character)
         <div class="container mt-5">
             <h1>Add XP</h1>
             <form method="POST" action="/add-xp">
+                <input type="number" id="campaignId" name="campaignId" value={ strconv.Itoa(int(characters[0].CampaignID)) } hidden>
                 <div class="container">
                     <div class="row">
                         <div class="col-6">

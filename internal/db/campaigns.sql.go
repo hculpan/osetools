@@ -10,6 +10,42 @@ import (
 	"database/sql"
 )
 
+const getCampaignById = `-- name: GetCampaignById :one
+SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE id = ?
+`
+
+func (q *Queries) GetCampaignById(ctx context.Context, id int64) (Campaign, error) {
+	row := q.db.QueryRowContext(ctx, getCampaignById, id)
+	var i Campaign
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Key,
+		&i.UserID,
+		&i.CreateDatetime,
+	)
+	return i, err
+}
+
+const getCampaignByName = `-- name: GetCampaignByName :one
+SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE name = ?
+`
+
+func (q *Queries) GetCampaignByName(ctx context.Context, name string) (Campaign, error) {
+	row := q.db.QueryRowContext(ctx, getCampaignByName, name)
+	var i Campaign
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Key,
+		&i.UserID,
+		&i.CreateDatetime,
+	)
+	return i, err
+}
+
 const getCampaigns = `-- name: GetCampaigns :many
 SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE user_id = ?
 `
@@ -88,19 +124,25 @@ func (q *Queries) GetCampaignsWithCharacterCount(ctx context.Context, userID int
 }
 
 const insertCampaign = `-- name: InsertCampaign :one
-INSERT INTO campaigns (name, key, user_id, create_datetime)
-VALUES (?, ?, ?, datetime('now', 'localtime'))
+INSERT INTO campaigns (name, description, key, user_id, create_datetime)
+VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
 RETURNING id, name, description, "key", user_id, create_datetime
 `
 
 type InsertCampaignParams struct {
-	Name   string
-	Key    string
-	UserID int64
+	Name        string
+	Description sql.NullString
+	Key         string
+	UserID      int64
 }
 
 func (q *Queries) InsertCampaign(ctx context.Context, arg InsertCampaignParams) (Campaign, error) {
-	row := q.db.QueryRowContext(ctx, insertCampaign, arg.Name, arg.Key, arg.UserID)
+	row := q.db.QueryRowContext(ctx, insertCampaign,
+		arg.Name,
+		arg.Description,
+		arg.Key,
+		arg.UserID,
+	)
 	var i Campaign
 	err := row.Scan(
 		&i.ID,

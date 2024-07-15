@@ -7,7 +7,9 @@ import (
 "github.com/hculpan/osetools/internal/utils"
 )
 
-templ XpTemplate(appTitle string, username string, characters []db.GetCharactersForCampaignWithXpRow, authorized bool,
+templ XpTemplate(appTitle string, username string, campaignId int, campaignName string,
+characters []db.GetCharactersForCampaignWithXpRow,
+authorized bool,
 msg string) {
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +21,7 @@ msg string) {
         @components.Sidebar("Characters", username, authorized)
 
         <div class="container mt-5">
-            <h1>Characters</h1>
+            <h1>Characters for { campaignName }</h1>
             <table class="table table-dark table-striped">
                 <thead>
                     <tr>
@@ -50,18 +52,11 @@ msg string) {
                     }
                 </tbody>
             </table>
-            if len(characters) == 0 {
+            if authorized {
             <div class="text-center">
-                <button class="btn button" href="" disabled>Add XP</button>
-            </div>
-            } else if authorized {
-            <div class="text-center">
-                <a class="btn button" href={ templ.SafeURL("/add-xp/" + strconv.Itoa(int(characters[0].CampaignID)))
-                    }>Add XP</a>
-                <a class="btn button" href={ templ.SafeURL("/gold-for-xp/" +
-                    strconv.Itoa(int(characters[0].CampaignID))) }>Gold for XP</a>
-                <a class="btn button" href={ templ.SafeURL("/add-character/" +
-                    strconv.Itoa(int(characters[0].CampaignID))) }>Add Character</a>
+                <a class="btn button" href={ templ.SafeURL("/add-xp/" + strconv.Itoa(campaignId)) }>Add XP</a>
+                <a class="btn button" href={ templ.SafeURL("/add-character/" + strconv.Itoa(campaignId)) }>Add
+                    Character</a>
             </div>
             }
             switch msg {

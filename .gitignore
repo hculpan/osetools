@@ -12,6 +12,7 @@ osetools-cli.linux
 *.dll
 *.so
 *.dylib
+*.zip
 db_data
 tmp
 .env

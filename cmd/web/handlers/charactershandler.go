@@ -23,6 +23,13 @@ func CharactersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	dbCampaign, err := dbutils.GetQueries().GetCampaignById(r.Context(), int64(idNum))
+	if err != nil {
+		slog.Error(fmt.Errorf("unable to retrieve campaign %d: %w", idNum, err).Error())
+		http.Error(w, fmt.Errorf("unable to retrieve campaign %d: %w", idNum, err).Error(), http.StatusInternalServerError)
+		return
+	}
+
 	msg := r.URL.Query().Get("msg")
 
 	characters, err := dbutils.GetQueries().GetCharactersForCampaignWithXp(r.Context(), int64(idNum))
@@ -32,6 +39,6 @@ func CharactersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comp := templates.XpTemplate(appTitle, auth.GetCurrentUsername(r), characters, authorized, msg)
+	comp := templates.XpTemplate(appTitle, auth.GetCurrentUsername(r), idNum, dbCampaign.Name, characters, authorized, msg)
 	comp.Render(r.Context(), w)
 }

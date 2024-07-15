@@ -48,7 +48,20 @@ func AddXpTemplate(appTitle string, username string, characters []db.Character) 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container mt-5\"><h1>Add XP</h1><form method=\"POST\" action=\"/add-xp\"><div class=\"container\"><div class=\"row\"><div class=\"col-6\"><table class=\"table table-dark table-striped\"><thead><tr><th class=\"text-center\" scope=\"col\">Selected</th><th scope=\"col\">Name</th><th scope=\"col\">Player</th></tr></thead> <tbody><tr><td class=\"text-center\"><input class=\"form-check-input\" type=\"checkbox\" value=\"\" id=\"masterCheckbox\"> Select All</td><td></td><td></td></tr>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container mt-5\"><h1>Add XP</h1><form method=\"POST\" action=\"/add-xp\"><input type=\"number\" id=\"campaignId\" name=\"campaignId\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(characters[0].CampaignID)))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 21, Col: 122}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hidden><div class=\"container\"><div class=\"row\"><div class=\"col-6\"><table class=\"table table-dark table-striped\"><thead><tr><th class=\"text-center\" scope=\"col\">Selected</th><th scope=\"col\">Name</th><th scope=\"col\">Player</th></tr></thead> <tbody><tr><td class=\"text-center\"><input class=\"form-check-input\" type=\"checkbox\" value=\"\" id=\"masterCheckbox\"> Select All</td><td></td><td></td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -57,13 +70,13 @@ func AddXpTemplate(appTitle string, username string, characters []db.Character) 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(
 				strconv.Itoa(int(c.ID)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 43, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 44, Col: 71}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -71,12 +84,12 @@ func AddXpTemplate(appTitle string, username string, characters []db.Character) 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 45, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 46, Col: 52}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -84,12 +97,12 @@ func AddXpTemplate(appTitle string, username string, characters []db.Character) 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(c.PlayerName)
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(c.PlayerName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 46, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/templates/addxptemplate.templ`, Line: 47, Col: 58}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
