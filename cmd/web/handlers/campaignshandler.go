@@ -7,19 +7,24 @@ import (
 
 	"github.com/hculpan/osetools/cmd/web/templates"
 	"github.com/hculpan/osetools/internal/auth"
+	"github.com/hculpan/osetools/internal/db"
 	"github.com/hculpan/osetools/internal/dbutils"
 )
 
 func CampaignsHandler(w http.ResponseWriter, r *http.Request) {
 	authorized := auth.IsAuthorized(r)
 
-	user, err := dbutils.GetQueries().GetUser(r.Context(), auth.GetCurrentUsername(r))
-	if err != nil {
-		slog.Error(fmt.Errorf("failed to load user: %w", err).Error())
-		return
+	var user db.User
+	if authorized {
+		tmpuser, err := dbutils.GetQueries().GetUser(r.Context(), auth.GetCurrentUsername(r))
+		if err != nil {
+			slog.Error(fmt.Errorf("failed to load user: %w", err).Error())
+			return
+		}
+		user = tmpuser
 	}
 
-	campaigns, err := dbutils.GetQueries().GetCampaignsWithCharacterCount(r.Context(), user.ID)
+	campaigns, err := dbutils.GetQueries().GetCampaignsWithCharacterCount(r.Context(), user.ID.(int64))
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to load user: %w", err).Error())
 		return

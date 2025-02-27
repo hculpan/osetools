@@ -55,7 +55,7 @@ func (q *Queries) GetXpBonusForCharacter(ctx context.Context, characterID int64)
 
 const insertXpBonusForCharacter = `-- name: InsertXpBonusForCharacter :one
 INSERT INTO xp_bonus_reasons (xp_bonus, reason, character_id, create_datetime)
-VALUES (?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, now())
 RETURNING id, xp_bonus, reason, character_id, create_datetime
 `
 

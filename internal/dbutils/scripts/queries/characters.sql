@@ -1,6 +1,6 @@
 -- name: InsertCharacter :one
 INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime)
-VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, ?, now())
 RETURNING *;
 
 -- name: GetCharactersForCampaign :many

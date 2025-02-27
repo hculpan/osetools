@@ -2,6 +2,7 @@ package dbutils
 
 import (
 	_ "embed"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 
 	"database/sql"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var dbase *sql.DB
@@ -25,14 +26,29 @@ func init() {
 		log.Fatalf("missing .env file: %s", err.Error())
 	}
 
-	// Update this whatever variables you need to retrieve to
-	// initialize the db
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		log.Fatal("missing DB_PATH in configuration file")
+	dbServer := os.Getenv("DB_SERVER")
+	if dbServer == "" {
+		log.Fatal("missing DB_SERVER in configuration file")
 	}
 
-	dbase, err = sql.Open("sqlite", dbPath)
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		log.Fatal("missing DB_NAME in configuration file")
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		log.Fatal("missing DB_USER in configuration file")
+	}
+
+	dbPassword := os.Getenv("DB_PASSWORD")
+	if dbPassword == "" {
+		log.Fatal("missing DB_PASSWORD in configuration file")
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPassword, dbServer, dbName)
+
+	dbase, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)
 	}

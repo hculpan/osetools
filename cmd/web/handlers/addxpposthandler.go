@@ -55,7 +55,7 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 			XpAward:          int64(xpAward),
 			XpAwardWithBonus: int64(xp),
 			Reason:           reason,
-			CharacterID:      character.ID,
+			CharacterID:      character.ID.(int64),
 		})
 		if err != nil {
 			e := fmt.Errorf("error saving xp award for character with id %d : %w", id, err)

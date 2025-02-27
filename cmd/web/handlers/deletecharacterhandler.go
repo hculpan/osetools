@@ -23,13 +23,13 @@ func DeleteCharacterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 
-	err = dbutils.GetQueries().DeleteXpAwardsForCharacter(r.Context(), dbCharacter.ID)
+	err = dbutils.GetQueries().DeleteXpAwardsForCharacter(r.Context(), dbCharacter.ID.(int64))
 	if err != nil {
 		slog.Error("error deleting xpawards", "msg", err.Error())
 		http.Redirect(w, r, "/characters/"+strconv.Itoa(int(dbCharacter.CampaignID)), http.StatusSeeOther)
 	}
 
-	err = dbutils.GetQueries().DeleteXpBonusForCharacter(r.Context(), dbCharacter.ID)
+	err = dbutils.GetQueries().DeleteXpBonusForCharacter(r.Context(), dbCharacter.ID.(int64))
 	if err != nil {
 		slog.Error("error deleting xpbonus", "msg", err.Error())
 		http.Redirect(w, r, "/characters/"+strconv.Itoa(int(dbCharacter.CampaignID)), http.StatusSeeOther)

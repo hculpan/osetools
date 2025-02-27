@@ -40,7 +40,7 @@ func ListCampaigns(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	campaigns, err := queries.GetCampaigns(ctx, id)
+	campaigns, err := queries.GetCampaigns(ctx, id.(int64))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			fmt.Printf("User %q has no campaigns\n", userName)
@@ -51,7 +51,7 @@ func ListCampaigns(cmd *cobra.Command, args []string) error {
 	}
 
 	for i, c := range campaigns {
-		fmt.Printf("%d: %s [%s]\n", i+1, c.Name, c.Key)
+		fmt.Printf("%d: %s [%s]\n", i+1, c.Name, c.KeyField)
 	}
 
 	return nil

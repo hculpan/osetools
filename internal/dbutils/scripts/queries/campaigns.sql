@@ -1,6 +1,6 @@
 -- name: InsertCampaign :one
-INSERT INTO campaigns (name, description, key, user_id, create_datetime)
-VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+INSERT INTO campaigns (name, description, key_field, user_id, create_datetime)
+VALUES (?, ?, ?, ?, now())
 RETURNING *;
 
 -- name: GetCampaignByName :one

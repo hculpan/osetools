@@ -10,16 +10,16 @@ import (
 )
 
 type Campaign struct {
-	ID             int64
+	ID             interface{}
 	Name           string
 	Description    sql.NullString
-	Key            string
+	KeyField       string
 	UserID         int64
 	CreateDatetime time.Time
 }
 
 type Character struct {
-	ID             int64
+	ID             interface{}
 	Name           string
 	PlayerName     string
 	XpBonus        int64
@@ -28,7 +28,7 @@ type Character struct {
 }
 
 type User struct {
-	ID             int64
+	ID             interface{}
 	Username       string
 	Realname       sql.NullString
 	Password       string
@@ -36,7 +36,7 @@ type User struct {
 }
 
 type XpAward struct {
-	ID               int64
+	ID               interface{}
 	XpAward          int64
 	XpAwardWithBonus int64
 	Reason           string
@@ -45,7 +45,7 @@ type XpAward struct {
 }
 
 type XpBonusReason struct {
-	ID             int64
+	ID             interface{}
 	XpBonus        int64
 	Reason         string
 	CharacterID    int64

@@ -32,8 +32,8 @@ func AddCampaignPostHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = dbutils.GetQueries().InsertCampaign(r.Context(), db.InsertCampaignParams{
 		Name:        name,
 		Description: sql.NullString{String: description, Valid: true},
-		UserID:      user.ID,
-		Key:         uuid.New().String(),
+		UserID:      user.ID.(int64),
+		KeyField:    uuid.New().String(),
 	})
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to insert campaign: %w", err).Error())

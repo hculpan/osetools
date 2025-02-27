@@ -41,7 +41,7 @@ templ AddXpTemplate(appTitle string, username string, characters []db.Character)
                                     <tr>
                                         <td class="text-center">
                                             <input class="form-check-input childCheckbox" type="checkbox" value={
-                                                strconv.Itoa(int(c.ID)) } name="selectedIds[]" />
+                                                strconv.Itoa(int(c.ID.(int64))) } name="selectedIds[]" />
                                         </td>
                                         <td>{ c.Name }</td>
                                         <td>{ c.PlayerName }</td>

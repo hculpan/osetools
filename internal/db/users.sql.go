@@ -18,7 +18,7 @@ WHERE c.user_id = u.user_id
 `
 
 type GetAllCharactersRow struct {
-	ID             int64
+	ID             interface{}
 	Name           string
 	PlayerName     string
 	XpBonus        int64
@@ -83,9 +83,9 @@ WHERE username = ?
 LIMIT 1
 `
 
-func (q *Queries) GetUserId(ctx context.Context, username string) (int64, error) {
+func (q *Queries) GetUserId(ctx context.Context, username string) (interface{}, error) {
 	row := q.db.QueryRowContext(ctx, getUserId, username)
-	var id int64
+	var id interface{}
 	err := row.Scan(&id)
 	return id, err
 }
@@ -125,7 +125,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 
 const insertUser = `-- name: InsertUser :one
 INSERT INTO users (username, realname, password, create_datetime)
-VALUES (?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, now())
 RETURNING id, username, realname, password, create_datetime
 `
 

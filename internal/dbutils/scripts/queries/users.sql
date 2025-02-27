@@ -1,6 +1,6 @@
 -- name: InsertUser :one
 INSERT INTO users (username, realname, password, create_datetime)
-VALUES (?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, now())
 RETURNING *;
 
 -- name: GetUsers :many

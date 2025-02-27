@@ -7,15 +7,14 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
+	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/hculpan/osetools/internal/dbutils"
 )
@@ -34,23 +33,29 @@ func InitDB(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("missing .env file: %w", err)
 	}
 
-	// Update this whatever variables you need to retrieve to
-	// initialize the db
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		return errors.New("missing DB_PATH in configuration file")
+	dbServer := os.Getenv("DB_SERVER")
+	if dbServer == "" {
+		log.Fatal("missing DB_SERVER in configuration file")
 	}
 
-	if _, err := os.Stat(dbPath); err == nil {
-		err := os.Remove(dbPath)
-		if err != nil {
-			return err
-		}
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		log.Fatal("missing DB_NAME in configuration file")
 	}
-	os.MkdirAll(filepath.Dir(dbPath), 0755)
-	os.Create(dbPath)
 
-	dbase, err := sql.Open("sqlite", dbPath)
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		log.Fatal("missing DB_USER in configuration file")
+	}
+
+	dbPassword := os.Getenv("DB_PASSWORD")
+	if dbPassword == "" {
+		log.Fatal("missing DB_PASSWORD in configuration file")
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPassword, dbServer, dbName)
+
+	dbase, err = sql.Open("mysql", dsn)
 	if err != nil {
 		return err
 	}

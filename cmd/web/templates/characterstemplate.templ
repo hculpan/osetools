@@ -40,7 +40,7 @@ msg string) {
                     </tr>
                     for _, c := range characters {
                     <tr>
-                        <td><a href={ templ.SafeURL("/character/" + strconv.Itoa(int(c.ID))) }>{ c.Name }</a></td>
+                        <td><a href={ templ.SafeURL("/character/" + strconv.Itoa(int(c.ID.(int64)))) }>{ c.Name }</a></td>
                         <td>{ c.PlayerName }</td>
                         <td class=" text-center">{ utils.FormatInt(int(c.XpBonus)) }%</td>
                         if c.TotalXp.Valid {

@@ -71,7 +71,7 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 		XpAward:          int64(totalXp),
 		XpAwardWithBonus: int64(totalXp),
 		Reason:           "Initial",
-		CharacterID:      dbCharacter.ID,
+		CharacterID:      dbCharacter.ID.(int64),
 	})
 	if err != nil {
 		slog.Error("error persisting character", "msg", err.Error())
@@ -82,7 +82,7 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 		_, err := dbutils.GetQueries().InsertXpBonusForCharacter(r.Context(), db.InsertXpBonusForCharacterParams{
 			XpBonus:     int64(e.XpBonus),
 			Reason:      e.Reason,
-			CharacterID: dbCharacter.ID,
+			CharacterID: dbCharacter.ID.(int64),
 		})
 		if err != nil {
 			slog.Error("error persisting character", "msg", err.Error())

@@ -14,7 +14,7 @@ const deleteCharacter = `-- name: DeleteCharacter :exec
 DELETE FROM characters where id = ?
 `
 
-func (q *Queries) DeleteCharacter(ctx context.Context, id int64) error {
+func (q *Queries) DeleteCharacter(ctx context.Context, id interface{}) error {
 	_, err := q.db.ExecContext(ctx, deleteCharacter, id)
 	return err
 }
@@ -24,7 +24,7 @@ SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime FROM charac
 where id = ? LIMIT 1
 `
 
-func (q *Queries) GetCharacterById(ctx context.Context, id int64) (Character, error) {
+func (q *Queries) GetCharacterById(ctx context.Context, id interface{}) (Character, error) {
 	row := q.db.QueryRowContext(ctx, getCharacterById, id)
 	var i Character
 	err := row.Scan(
@@ -47,7 +47,7 @@ GROUP BY characters.id LIMIT 1
 `
 
 type GetCharacterWithXpRow struct {
-	ID         int64
+	ID         interface{}
 	Name       string
 	PlayerName string
 	CampaignID int64
@@ -55,7 +55,7 @@ type GetCharacterWithXpRow struct {
 	TotalXp    sql.NullFloat64
 }
 
-func (q *Queries) GetCharacterWithXp(ctx context.Context, id int64) (GetCharacterWithXpRow, error) {
+func (q *Queries) GetCharacterWithXp(ctx context.Context, id interface{}) (GetCharacterWithXpRow, error) {
 	row := q.db.QueryRowContext(ctx, getCharacterWithXp, id)
 	var i GetCharacterWithXpRow
 	err := row.Scan(
@@ -113,7 +113,7 @@ GROUP BY characters.id
 `
 
 type GetCharactersForCampaignWithXpRow struct {
-	ID         int64
+	ID         interface{}
 	Name       string
 	PlayerName string
 	CampaignID int64
@@ -153,7 +153,7 @@ func (q *Queries) GetCharactersForCampaignWithXp(ctx context.Context, campaignID
 
 const insertCharacter = `-- name: InsertCharacter :one
 INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime)
-VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, ?, now())
 RETURNING id, name, player_name, xp_bonus, campaign_id, create_datetime
 `
 

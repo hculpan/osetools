@@ -5,7 +5,7 @@ ORDER BY id desc;
 
 -- name: InsertXpAward :one
 INSERT INTO xp_awards (xp_award, xp_award_with_bonus, reason, character_id, create_datetime)
-VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+VALUES (?, ?, ?, ?, now())
 RETURNING *;
 
 -- name: DeleteXpAwardsForCharacter :exec

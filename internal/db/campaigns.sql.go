@@ -11,17 +11,17 @@ import (
 )
 
 const getCampaignById = `-- name: GetCampaignById :one
-SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE id = ?
+SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE id = ?
 `
 
-func (q *Queries) GetCampaignById(ctx context.Context, id int64) (Campaign, error) {
+func (q *Queries) GetCampaignById(ctx context.Context, id interface{}) (Campaign, error) {
 	row := q.db.QueryRowContext(ctx, getCampaignById, id)
 	var i Campaign
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.Key,
+		&i.KeyField,
 		&i.UserID,
 		&i.CreateDatetime,
 	)
@@ -29,7 +29,7 @@ func (q *Queries) GetCampaignById(ctx context.Context, id int64) (Campaign, erro
 }
 
 const getCampaignByName = `-- name: GetCampaignByName :one
-SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE name = ?
+SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE name = ?
 `
 
 func (q *Queries) GetCampaignByName(ctx context.Context, name string) (Campaign, error) {
@@ -39,7 +39,7 @@ func (q *Queries) GetCampaignByName(ctx context.Context, name string) (Campaign,
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.Key,
+		&i.KeyField,
 		&i.UserID,
 		&i.CreateDatetime,
 	)
@@ -47,7 +47,7 @@ func (q *Queries) GetCampaignByName(ctx context.Context, name string) (Campaign,
 }
 
 const getCampaigns = `-- name: GetCampaigns :many
-SELECT id, name, description, "key", user_id, create_datetime FROM campaigns WHERE user_id = ?
+SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE user_id = ?
 `
 
 func (q *Queries) GetCampaigns(ctx context.Context, userID int64) ([]Campaign, error) {
@@ -63,7 +63,7 @@ func (q *Queries) GetCampaigns(ctx context.Context, userID int64) ([]Campaign, e
 			&i.ID,
 			&i.Name,
 			&i.Description,
-			&i.Key,
+			&i.KeyField,
 			&i.UserID,
 			&i.CreateDatetime,
 		); err != nil {
@@ -89,7 +89,7 @@ GROUP BY campaigns.id
 `
 
 type GetCampaignsWithCharacterCountRow struct {
-	ID             int64
+	ID             interface{}
 	Name           string
 	Description    sql.NullString
 	CharacterCount int64
@@ -124,15 +124,15 @@ func (q *Queries) GetCampaignsWithCharacterCount(ctx context.Context, userID int
 }
 
 const insertCampaign = `-- name: InsertCampaign :one
-INSERT INTO campaigns (name, description, key, user_id, create_datetime)
-VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
-RETURNING id, name, description, "key", user_id, create_datetime
+INSERT INTO campaigns (name, description, key_field, user_id, create_datetime)
+VALUES (?, ?, ?, ?, now())
+RETURNING id, name, description, key_field, user_id, create_datetime
 `
 
 type InsertCampaignParams struct {
 	Name        string
 	Description sql.NullString
-	Key         string
+	KeyField    string
 	UserID      int64
 }
 
@@ -140,7 +140,7 @@ func (q *Queries) InsertCampaign(ctx context.Context, arg InsertCampaignParams) 
 	row := q.db.QueryRowContext(ctx, insertCampaign,
 		arg.Name,
 		arg.Description,
-		arg.Key,
+		arg.KeyField,
 		arg.UserID,
 	)
 	var i Campaign
@@ -148,7 +148,7 @@ func (q *Queries) InsertCampaign(ctx context.Context, arg InsertCampaignParams) 
 		&i.ID,
 		&i.Name,
 		&i.Description,
-		&i.Key,
+		&i.KeyField,
 		&i.UserID,
 		&i.CreateDatetime,
 	)

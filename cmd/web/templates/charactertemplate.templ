@@ -101,7 +101,7 @@ xpAwards []db.XpAward) {
             </div>
             <hr>
             if authorized {
-            <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID)))
+            <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID.(int64))))
                 }>Delete</a>
             }
         </div>

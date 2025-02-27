@@ -28,7 +28,7 @@ templ CampaignsTemplate(appTitle string, username string, campaigns []db.GetCamp
                 <tbody>
                     for _, c := range campaigns {
                     <tr>
-                        <td><a href={ templ.SafeURL("/characters/" + strconv.Itoa(int(c.ID))) }>{ c.Name }</a></td>
+                        <td><a href={ templ.SafeURL("/characters/" + strconv.Itoa(int(c.ID.(int64)))) }>{ c.Name }</a></td>
                         <td>{ c.Description.String }</td>
                         <td class=" text-center">{ strconv.Itoa(int(c.CharacterCount)) }</td>
                     </tr>
