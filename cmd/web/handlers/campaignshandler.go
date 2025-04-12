@@ -24,7 +24,7 @@ func CampaignsHandler(w http.ResponseWriter, r *http.Request) {
 		user = tmpuser
 	}
 
-	campaigns, err := dbutils.GetQueries().GetCampaignsWithCharacterCount(r.Context(), user.ID.(int64))
+	campaigns, err := dbutils.GetQueries().GetCampaignsWithCharacterCount(r.Context())
 	if err != nil {
 		slog.Error(fmt.Errorf("failed to load user: %w", err).Error())
 		return

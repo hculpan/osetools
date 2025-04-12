@@ -21,7 +21,7 @@ func AddXpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	characters, err := dbutils.GetQueries().GetCharactersForCampaign(r.Context(), int64(idNum))
+	characters, err := dbutils.GetQueries().GetCharactersForCampaign(r.Context(), int32(idNum))
 	if err != nil {
 		slog.Error(fmt.Errorf("unable to retrieve characters for campaign id %d: %w", idNum, err).Error())
 		http.Error(w, fmt.Errorf("unable to retrieve characters for campaign id %d: %w", idNum, err).Error(), http.StatusInternalServerError)

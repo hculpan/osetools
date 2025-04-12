@@ -10,13 +10,13 @@ import (
 
 func routes(router *chi.Mux) *chi.Mux {
 	if router != nil {
-		router.Get("/", handlers.HomeHandler)
+		router.Get("/", handlers.CampaignsHandler)
 		router.Get("/info", handlers.InfoHandler)
 		router.Get("/login", handlers.LoginHandler)
 		router.Post("/login", handlers.LoginPostHandler)
 		router.Get("/logout", handlers.LogoutHandler)
 
-		router.Get("/home", auth.AuthMiddleware(handlers.HomeHandler))
+		router.Get("/home", auth.AuthMiddleware(handlers.CampaignsHandler))
 		router.Get("/account", auth.AuthMiddleware(handlers.AccountHandler))
 		router.Get("/campaigns", auth.AuthMiddleware(handlers.CampaignsHandler))
 		router.Get("/characters/{campaignId}", handlers.CharactersHandler)

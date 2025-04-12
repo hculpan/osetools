@@ -27,6 +27,9 @@ CREATE TABLE characters (
    xp_bonus INTEGER NOT NULL,
    campaign_id INTEGER NOT NULL,
    create_datetime DATETIME NOT NULL,
+   total_xp INTEGER NOT NULL,
+   dead BOOLEAN NOT NULL DEFAULT FALSE,
+   retainer BOOLEAN NOT NULL DEFAULT FALSE,
    FOREIGN KEY(campaign_id) REFERENCES campaigns(id)
 );
 

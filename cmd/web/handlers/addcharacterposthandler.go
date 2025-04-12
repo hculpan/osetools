@@ -56,22 +56,27 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 		xpBonusTotal += xpBonus
 	}
 
-	dbCharacter, err := dbutils.GetQueries().InsertCharacter(r.Context(), db.InsertCharacterParams{
+	err = dbutils.GetQueries().InsertCharacter(r.Context(), db.InsertCharacterParams{
 		Name:       characterName,
 		PlayerName: playerName,
-		XpBonus:    int64(xpBonusTotal),
-		CampaignID: int64(campaignId),
+		XpBonus:    int32(xpBonusTotal),
+		CampaignID: int32(campaignId),
 	})
 	if err != nil {
 		slog.Error("error persisting character", "msg", err.Error())
 		http.Redirect(w, r, "/characters/"+id, http.StatusSeeOther)
 	}
+	dbCharacter, err := dbutils.GetQueries().GetLatestCharacterByID(r.Context())
+	if err != nil {
+		slog.Error("error retrieving persisted character", "msg", err.Error())
+		http.Redirect(w, r, "/characters/"+id, http.StatusSeeOther)
+	}
 
-	_, err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
-		XpAward:          int64(totalXp),
-		XpAwardWithBonus: int64(totalXp),
+	err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
+		XpAward:          int32(totalXp),
+		XpAwardWithBonus: int32(totalXp),
 		Reason:           "Initial",
-		CharacterID:      dbCharacter.ID.(int64),
+		CharacterID:      dbCharacter.ID,
 	})
 	if err != nil {
 		slog.Error("error persisting character", "msg", err.Error())
@@ -79,10 +84,10 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, e := range xpBonusEntries {
-		_, err := dbutils.GetQueries().InsertXpBonusForCharacter(r.Context(), db.InsertXpBonusForCharacterParams{
-			XpBonus:     int64(e.XpBonus),
+		err := dbutils.GetQueries().InsertXpBonusForCharacter(r.Context(), db.InsertXpBonusForCharacterParams{
+			XpBonus:     int32(e.XpBonus),
 			Reason:      e.Reason,
-			CharacterID: dbCharacter.ID.(int64),
+			CharacterID: dbCharacter.ID,
 		})
 		if err != nil {
 			slog.Error("error persisting character", "msg", err.Error())

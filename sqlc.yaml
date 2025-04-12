@@ -1,6 +1,6 @@
 version: "2"
 sql:
-  - engine: "sqlite"
+  - engine: "mysql"
     queries: "internal/dbutils/scripts/queries"
     schema: "internal/dbutils/scripts/schema.sql"
     gen:

@@ -14,9 +14,26 @@ DELETE FROM xp_bonus_reasons
 WHERE character_id = ?
 `
 
-func (q *Queries) DeleteXpBonusForCharacter(ctx context.Context, characterID int64) error {
+func (q *Queries) DeleteXpBonusForCharacter(ctx context.Context, characterID int32) error {
 	_, err := q.db.ExecContext(ctx, deleteXpBonusForCharacter, characterID)
 	return err
+}
+
+const getLatestXpBonusReasonByID = `-- name: GetLatestXpBonusReasonByID :one
+SELECT id, xp_bonus, reason, character_id, create_datetime FROM xp_bonus_reasons WHERE id = LAST_INSERT_ID()
+`
+
+func (q *Queries) GetLatestXpBonusReasonByID(ctx context.Context) (XpBonusReason, error) {
+	row := q.db.QueryRowContext(ctx, getLatestXpBonusReasonByID)
+	var i XpBonusReason
+	err := row.Scan(
+		&i.ID,
+		&i.XpBonus,
+		&i.Reason,
+		&i.CharacterID,
+		&i.CreateDatetime,
+	)
+	return i, err
 }
 
 const getXpBonusForCharacter = `-- name: GetXpBonusForCharacter :many
@@ -24,7 +41,7 @@ SELECT id, xp_bonus, reason, character_id, create_datetime FROM xp_bonus_reasons
 WHERE character_id = ?
 `
 
-func (q *Queries) GetXpBonusForCharacter(ctx context.Context, characterID int64) ([]XpBonusReason, error) {
+func (q *Queries) GetXpBonusForCharacter(ctx context.Context, characterID int32) ([]XpBonusReason, error) {
 	rows, err := q.db.QueryContext(ctx, getXpBonusForCharacter, characterID)
 	if err != nil {
 		return nil, err
@@ -53,27 +70,18 @@ func (q *Queries) GetXpBonusForCharacter(ctx context.Context, characterID int64)
 	return items, nil
 }
 
-const insertXpBonusForCharacter = `-- name: InsertXpBonusForCharacter :one
+const insertXpBonusForCharacter = `-- name: InsertXpBonusForCharacter :exec
 INSERT INTO xp_bonus_reasons (xp_bonus, reason, character_id, create_datetime)
 VALUES (?, ?, ?, now())
-RETURNING id, xp_bonus, reason, character_id, create_datetime
 `
 
 type InsertXpBonusForCharacterParams struct {
-	XpBonus     int64
+	XpBonus     int32
 	Reason      string
-	CharacterID int64
+	CharacterID int32
 }
 
-func (q *Queries) InsertXpBonusForCharacter(ctx context.Context, arg InsertXpBonusForCharacterParams) (XpBonusReason, error) {
-	row := q.db.QueryRowContext(ctx, insertXpBonusForCharacter, arg.XpBonus, arg.Reason, arg.CharacterID)
-	var i XpBonusReason
-	err := row.Scan(
-		&i.ID,
-		&i.XpBonus,
-		&i.Reason,
-		&i.CharacterID,
-		&i.CreateDatetime,
-	)
-	return i, err
+func (q *Queries) InsertXpBonusForCharacter(ctx context.Context, arg InsertXpBonusForCharacterParams) error {
+	_, err := q.db.ExecContext(ctx, insertXpBonusForCharacter, arg.XpBonus, arg.Reason, arg.CharacterID)
+	return err
 }

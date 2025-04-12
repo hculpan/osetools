@@ -7,24 +7,62 @@ package db
 
 import (
 	"context"
-	"database/sql"
+	"time"
 )
 
 const deleteCharacter = `-- name: DeleteCharacter :exec
 DELETE FROM characters where id = ?
 `
 
-func (q *Queries) DeleteCharacter(ctx context.Context, id interface{}) error {
+func (q *Queries) DeleteCharacter(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteCharacter, id)
 	return err
 }
 
+const getAllCharacters = `-- name: GetAllCharacters :many
+SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer
+FROM characters
+`
+
+func (q *Queries) GetAllCharacters(ctx context.Context) ([]Character, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCharacters)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Character
+	for rows.Next() {
+		var i Character
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PlayerName,
+			&i.XpBonus,
+			&i.CampaignID,
+			&i.CreateDatetime,
+			&i.TotalXp,
+			&i.Dead,
+			&i.Retainer,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCharacterById = `-- name: GetCharacterById :one
-SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime FROM characters
+SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer FROM characters
 where id = ? LIMIT 1
 `
 
-func (q *Queries) GetCharacterById(ctx context.Context, id interface{}) (Character, error) {
+func (q *Queries) GetCharacterById(ctx context.Context, id int32) (Character, error) {
 	row := q.db.QueryRowContext(ctx, getCharacterById, id)
 	var i Character
 	err := row.Scan(
@@ -34,47 +72,20 @@ func (q *Queries) GetCharacterById(ctx context.Context, id interface{}) (Charact
 		&i.XpBonus,
 		&i.CampaignID,
 		&i.CreateDatetime,
-	)
-	return i, err
-}
-
-const getCharacterWithXp = `-- name: GetCharacterWithXp :one
-SELECT characters.id, characters.name, characters.player_name, characters.campaign_id, characters.xp_bonus, SUM(xp_awards.xp_award_with_bonus) AS total_xp
-FROM characters
-LEFT JOIN xp_awards ON characters.id = xp_awards.character_id
-WHERE characters.id = ?
-GROUP BY characters.id LIMIT 1
-`
-
-type GetCharacterWithXpRow struct {
-	ID         interface{}
-	Name       string
-	PlayerName string
-	CampaignID int64
-	XpBonus    int64
-	TotalXp    sql.NullFloat64
-}
-
-func (q *Queries) GetCharacterWithXp(ctx context.Context, id interface{}) (GetCharacterWithXpRow, error) {
-	row := q.db.QueryRowContext(ctx, getCharacterWithXp, id)
-	var i GetCharacterWithXpRow
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.PlayerName,
-		&i.CampaignID,
-		&i.XpBonus,
 		&i.TotalXp,
+		&i.Dead,
+		&i.Retainer,
 	)
 	return i, err
 }
 
 const getCharactersForCampaign = `-- name: GetCharactersForCampaign :many
-SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime FROM characters
+SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer FROM characters
 WHERE campaign_id = ?
+  AND not dead
 `
 
-func (q *Queries) GetCharactersForCampaign(ctx context.Context, campaignID int64) ([]Character, error) {
+func (q *Queries) GetCharactersForCampaign(ctx context.Context, campaignID int32) ([]Character, error) {
 	rows, err := q.db.QueryContext(ctx, getCharactersForCampaign, campaignID)
 	if err != nil {
 		return nil, err
@@ -90,6 +101,9 @@ func (q *Queries) GetCharactersForCampaign(ctx context.Context, campaignID int64
 			&i.XpBonus,
 			&i.CampaignID,
 			&i.CreateDatetime,
+			&i.TotalXp,
+			&i.Dead,
+			&i.Retainer,
 		); err != nil {
 			return nil, err
 		}
@@ -104,39 +118,31 @@ func (q *Queries) GetCharactersForCampaign(ctx context.Context, campaignID int64
 	return items, nil
 }
 
-const getCharactersForCampaignWithXp = `-- name: GetCharactersForCampaignWithXp :many
-SELECT characters.id, characters.name, characters.player_name, characters.campaign_id, characters.xp_bonus, SUM(xp_awards.xp_award_with_bonus) AS total_xp
-FROM characters
-LEFT JOIN xp_awards ON characters.id = xp_awards.character_id
-WHERE characters.campaign_id = ?
-GROUP BY characters.id
+const getDeadCharactersForCampaign = `-- name: GetDeadCharactersForCampaign :many
+SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer FROM characters
+WHERE campaign_id = ?
+  AND dead=true
 `
 
-type GetCharactersForCampaignWithXpRow struct {
-	ID         interface{}
-	Name       string
-	PlayerName string
-	CampaignID int64
-	XpBonus    int64
-	TotalXp    sql.NullFloat64
-}
-
-func (q *Queries) GetCharactersForCampaignWithXp(ctx context.Context, campaignID int64) ([]GetCharactersForCampaignWithXpRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCharactersForCampaignWithXp, campaignID)
+func (q *Queries) GetDeadCharactersForCampaign(ctx context.Context, campaignID int32) ([]Character, error) {
+	rows, err := q.db.QueryContext(ctx, getDeadCharactersForCampaign, campaignID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetCharactersForCampaignWithXpRow
+	var items []Character
 	for rows.Next() {
-		var i GetCharactersForCampaignWithXpRow
+		var i Character
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.PlayerName,
-			&i.CampaignID,
 			&i.XpBonus,
+			&i.CampaignID,
+			&i.CreateDatetime,
 			&i.TotalXp,
+			&i.Dead,
+			&i.Retainer,
 		); err != nil {
 			return nil, err
 		}
@@ -151,26 +157,12 @@ func (q *Queries) GetCharactersForCampaignWithXp(ctx context.Context, campaignID
 	return items, nil
 }
 
-const insertCharacter = `-- name: InsertCharacter :one
-INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime)
-VALUES (?, ?, ?, ?, now())
-RETURNING id, name, player_name, xp_bonus, campaign_id, create_datetime
+const getLatestCharacterByID = `-- name: GetLatestCharacterByID :one
+SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer FROM characters WHERE id = LAST_INSERT_ID()
 `
 
-type InsertCharacterParams struct {
-	Name       string
-	PlayerName string
-	XpBonus    int64
-	CampaignID int64
-}
-
-func (q *Queries) InsertCharacter(ctx context.Context, arg InsertCharacterParams) (Character, error) {
-	row := q.db.QueryRowContext(ctx, insertCharacter,
-		arg.Name,
-		arg.PlayerName,
-		arg.XpBonus,
-		arg.CampaignID,
-	)
+func (q *Queries) GetLatestCharacterByID(ctx context.Context) (Character, error) {
+	row := q.db.QueryRowContext(ctx, getLatestCharacterByID)
 	var i Character
 	err := row.Scan(
 		&i.ID,
@@ -179,6 +171,58 @@ func (q *Queries) InsertCharacter(ctx context.Context, arg InsertCharacterParams
 		&i.XpBonus,
 		&i.CampaignID,
 		&i.CreateDatetime,
+		&i.TotalXp,
+		&i.Dead,
+		&i.Retainer,
 	)
 	return i, err
+}
+
+const insertCharacter = `-- name: InsertCharacter :exec
+INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime, total_xp)
+VALUES (?, ?, ?, ?, ?, now())
+`
+
+type InsertCharacterParams struct {
+	Name           string
+	PlayerName     string
+	XpBonus        int32
+	CampaignID     int32
+	CreateDatetime time.Time
+}
+
+func (q *Queries) InsertCharacter(ctx context.Context, arg InsertCharacterParams) error {
+	_, err := q.db.ExecContext(ctx, insertCharacter,
+		arg.Name,
+		arg.PlayerName,
+		arg.XpBonus,
+		arg.CampaignID,
+		arg.CreateDatetime,
+	)
+	return err
+}
+
+const updateCharacter = `-- name: UpdateCharacter :exec
+UPDATE characters 
+SET name = ?, player_name = ?, xp_bonus = ?, total_xp = ?
+WHERE id = ?
+`
+
+type UpdateCharacterParams struct {
+	Name       string
+	PlayerName string
+	XpBonus    int32
+	TotalXp    int32
+	ID         int32
+}
+
+func (q *Queries) UpdateCharacter(ctx context.Context, arg UpdateCharacterParams) error {
+	_, err := q.db.ExecContext(ctx, updateCharacter,
+		arg.Name,
+		arg.PlayerName,
+		arg.XpBonus,
+		arg.TotalXp,
+		arg.ID,
+	)
+	return err
 }

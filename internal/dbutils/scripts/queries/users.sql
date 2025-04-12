@@ -1,7 +1,9 @@
--- name: InsertUser :one
+-- name: InsertUser :exec
 INSERT INTO users (username, realname, password, create_datetime)
-VALUES (?, ?, ?, now())
-RETURNING *;
+VALUES (?, ?, ?, now());
+
+-- name: GetLatestUserByID :one
+SELECT * FROM users WHERE id = LAST_INSERT_ID();
 
 -- name: GetUsers :many
 SELECT * FROM users;
@@ -9,11 +11,6 @@ SELECT * FROM users;
 -- name: GetUser :one
 SELECT * FROM users
 WHERE username = ? LIMIT 1;
-
--- name: GetAllCharacters :many
-SELECT c.*, u.username
-FROM characters c, users u
-WHERE c.user_id = u.user_id;
 
 -- name: GetUserId :one
 SELECT id

@@ -8,54 +8,23 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 )
 
-const getAllCharacters = `-- name: GetAllCharacters :many
-SELECT c.id, c.name, c.player_name, c.xp_bonus, c.campaign_id, c.create_datetime, u.username
-FROM characters c, users u
-WHERE c.user_id = u.user_id
+const getLatestUserByID = `-- name: GetLatestUserByID :one
+SELECT id, username, realname, password, create_datetime FROM users WHERE id = LAST_INSERT_ID()
 `
 
-type GetAllCharactersRow struct {
-	ID             interface{}
-	Name           string
-	PlayerName     string
-	XpBonus        int64
-	CampaignID     int64
-	CreateDatetime time.Time
-	Username       string
-}
-
-func (q *Queries) GetAllCharacters(ctx context.Context) ([]GetAllCharactersRow, error) {
-	rows, err := q.db.QueryContext(ctx, getAllCharacters)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetAllCharactersRow
-	for rows.Next() {
-		var i GetAllCharactersRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.PlayerName,
-			&i.XpBonus,
-			&i.CampaignID,
-			&i.CreateDatetime,
-			&i.Username,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetLatestUserByID(ctx context.Context) (User, error) {
+	row := q.db.QueryRowContext(ctx, getLatestUserByID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Realname,
+		&i.Password,
+		&i.CreateDatetime,
+	)
+	return i, err
 }
 
 const getUser = `-- name: GetUser :one
@@ -83,9 +52,9 @@ WHERE username = ?
 LIMIT 1
 `
 
-func (q *Queries) GetUserId(ctx context.Context, username string) (interface{}, error) {
+func (q *Queries) GetUserId(ctx context.Context, username string) (int32, error) {
 	row := q.db.QueryRowContext(ctx, getUserId, username)
-	var id interface{}
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
@@ -123,10 +92,9 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
-const insertUser = `-- name: InsertUser :one
+const insertUser = `-- name: InsertUser :exec
 INSERT INTO users (username, realname, password, create_datetime)
 VALUES (?, ?, ?, now())
-RETURNING id, username, realname, password, create_datetime
 `
 
 type InsertUserParams struct {
@@ -135,15 +103,7 @@ type InsertUserParams struct {
 	Password string
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, insertUser, arg.Username, arg.Realname, arg.Password)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.Realname,
-		&i.Password,
-		&i.CreateDatetime,
-	)
-	return i, err
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
+	_, err := q.db.ExecContext(ctx, insertUser, arg.Username, arg.Realname, arg.Password)
+	return err
 }

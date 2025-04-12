@@ -33,8 +33,9 @@ func AddUser(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer closeDb()
 
-	user, err := queries.InsertUser(context.Background(), db.InsertUserParams{
+	err = queries.InsertUser(context.Background(), db.InsertUserParams{
 		Username: username,
 		Password: string(passwordHash),
 	})
@@ -42,9 +43,7 @@ func AddUser(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Printf("User %s inserted\n", user.Username)
-
-	closeDb()
+	fmt.Printf("User %s inserted\n", username)
 
 	return nil
 }

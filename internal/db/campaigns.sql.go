@@ -10,11 +10,29 @@ import (
 	"database/sql"
 )
 
+const getCampaignByID = `-- name: GetCampaignByID :one
+SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE id = LAST_INSERT_ID()
+`
+
+func (q *Queries) GetCampaignByID(ctx context.Context) (Campaign, error) {
+	row := q.db.QueryRowContext(ctx, getCampaignByID)
+	var i Campaign
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.KeyField,
+		&i.UserID,
+		&i.CreateDatetime,
+	)
+	return i, err
+}
+
 const getCampaignById = `-- name: GetCampaignById :one
 SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE id = ?
 `
 
-func (q *Queries) GetCampaignById(ctx context.Context, id interface{}) (Campaign, error) {
+func (q *Queries) GetCampaignById(ctx context.Context, id int32) (Campaign, error) {
 	row := q.db.QueryRowContext(ctx, getCampaignById, id)
 	var i Campaign
 	err := row.Scan(
@@ -50,7 +68,7 @@ const getCampaigns = `-- name: GetCampaigns :many
 SELECT id, name, description, key_field, user_id, create_datetime FROM campaigns WHERE user_id = ?
 `
 
-func (q *Queries) GetCampaigns(ctx context.Context, userID int64) ([]Campaign, error) {
+func (q *Queries) GetCampaigns(ctx context.Context, userID int32) ([]Campaign, error) {
 	rows, err := q.db.QueryContext(ctx, getCampaigns, userID)
 	if err != nil {
 		return nil, err
@@ -84,19 +102,18 @@ const getCampaignsWithCharacterCount = `-- name: GetCampaignsWithCharacterCount 
 SELECT campaigns.id, campaigns.name, campaigns.description, COUNT(characters.id) AS character_count
 FROM campaigns
 LEFT JOIN characters ON campaigns.id = characters.campaign_id
-WHERE user_id = ?
 GROUP BY campaigns.id
 `
 
 type GetCampaignsWithCharacterCountRow struct {
-	ID             interface{}
+	ID             int32
 	Name           string
 	Description    sql.NullString
 	CharacterCount int64
 }
 
-func (q *Queries) GetCampaignsWithCharacterCount(ctx context.Context, userID int64) ([]GetCampaignsWithCharacterCountRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCampaignsWithCharacterCount, userID)
+func (q *Queries) GetCampaignsWithCharacterCount(ctx context.Context) ([]GetCampaignsWithCharacterCountRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCampaignsWithCharacterCount)
 	if err != nil {
 		return nil, err
 	}
@@ -123,34 +140,24 @@ func (q *Queries) GetCampaignsWithCharacterCount(ctx context.Context, userID int
 	return items, nil
 }
 
-const insertCampaign = `-- name: InsertCampaign :one
+const insertCampaign = `-- name: InsertCampaign :exec
 INSERT INTO campaigns (name, description, key_field, user_id, create_datetime)
-VALUES (?, ?, ?, ?, now())
-RETURNING id, name, description, key_field, user_id, create_datetime
+VALUES (?, ?, ?, ?, NOW())
 `
 
 type InsertCampaignParams struct {
 	Name        string
 	Description sql.NullString
 	KeyField    string
-	UserID      int64
+	UserID      int32
 }
 
-func (q *Queries) InsertCampaign(ctx context.Context, arg InsertCampaignParams) (Campaign, error) {
-	row := q.db.QueryRowContext(ctx, insertCampaign,
+func (q *Queries) InsertCampaign(ctx context.Context, arg InsertCampaignParams) error {
+	_, err := q.db.ExecContext(ctx, insertCampaign,
 		arg.Name,
 		arg.Description,
 		arg.KeyField,
 		arg.UserID,
 	)
-	var i Campaign
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Description,
-		&i.KeyField,
-		&i.UserID,
-		&i.CreateDatetime,
-	)
-	return i, err
+	return err
 }

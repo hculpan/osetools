@@ -21,17 +21,17 @@ func CharacterHandler(w http.ResponseWriter, r *http.Request) {
 		slog.Error(fmt.Errorf("invalid id %q: %w", id, err).Error())
 	}
 
-	character, err := dbutils.GetQueries().GetCharacterWithXp(r.Context(), int64(idNum))
+	character, err := dbutils.GetQueries().GetCharacterById(r.Context(), int32(idNum))
 	if err != nil {
 		slog.Error(fmt.Errorf("unable to retrieve characters for campaign id %d: %w", idNum, err).Error())
 	}
 
-	xpBonusReasons, err := dbutils.GetQueries().GetXpBonusForCharacter(r.Context(), character.ID.(int64))
+	xpBonusReasons, err := dbutils.GetQueries().GetXpBonusForCharacter(r.Context(), character.ID)
 	if err != nil {
 		slog.Error(fmt.Errorf("unable to retrieve xp bonus reasons for character id %d: %w", character.ID, err).Error())
 	}
 
-	xpAwards, err := dbutils.GetQueries().GetXpAwardsForCharacter(r.Context(), character.ID.(int64))
+	xpAwards, err := dbutils.GetQueries().GetXpAwardsForCharacter(r.Context(), character.ID)
 	if err != nil {
 		slog.Error(fmt.Errorf("unable to retrieve xp awards for character id %d: %w", character.ID, err).Error())
 	}

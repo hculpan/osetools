@@ -13,9 +13,27 @@ const deleteXpAwardsForCharacter = `-- name: DeleteXpAwardsForCharacter :exec
 DELETE FROM xp_awards WHERE character_id = ?
 `
 
-func (q *Queries) DeleteXpAwardsForCharacter(ctx context.Context, characterID int64) error {
+func (q *Queries) DeleteXpAwardsForCharacter(ctx context.Context, characterID int32) error {
 	_, err := q.db.ExecContext(ctx, deleteXpAwardsForCharacter, characterID)
 	return err
+}
+
+const getLatestXpAwardByID = `-- name: GetLatestXpAwardByID :one
+SELECT id, xp_award, xp_award_with_bonus, reason, character_id, create_datetime FROM xp_awards WHERE id = LAST_INSERT_ID()
+`
+
+func (q *Queries) GetLatestXpAwardByID(ctx context.Context) (XpAward, error) {
+	row := q.db.QueryRowContext(ctx, getLatestXpAwardByID)
+	var i XpAward
+	err := row.Scan(
+		&i.ID,
+		&i.XpAward,
+		&i.XpAwardWithBonus,
+		&i.Reason,
+		&i.CharacterID,
+		&i.CreateDatetime,
+	)
+	return i, err
 }
 
 const getXpAwardsForCharacter = `-- name: GetXpAwardsForCharacter :many
@@ -24,7 +42,7 @@ WHERE character_id = ?
 ORDER BY id desc
 `
 
-func (q *Queries) GetXpAwardsForCharacter(ctx context.Context, characterID int64) ([]XpAward, error) {
+func (q *Queries) GetXpAwardsForCharacter(ctx context.Context, characterID int32) ([]XpAward, error) {
 	rows, err := q.db.QueryContext(ctx, getXpAwardsForCharacter, characterID)
 	if err != nil {
 		return nil, err
@@ -54,34 +72,24 @@ func (q *Queries) GetXpAwardsForCharacter(ctx context.Context, characterID int64
 	return items, nil
 }
 
-const insertXpAward = `-- name: InsertXpAward :one
+const insertXpAward = `-- name: InsertXpAward :exec
 INSERT INTO xp_awards (xp_award, xp_award_with_bonus, reason, character_id, create_datetime)
 VALUES (?, ?, ?, ?, now())
-RETURNING id, xp_award, xp_award_with_bonus, reason, character_id, create_datetime
 `
 
 type InsertXpAwardParams struct {
-	XpAward          int64
-	XpAwardWithBonus int64
+	XpAward          int32
+	XpAwardWithBonus int32
 	Reason           string
-	CharacterID      int64
+	CharacterID      int32
 }
 
-func (q *Queries) InsertXpAward(ctx context.Context, arg InsertXpAwardParams) (XpAward, error) {
-	row := q.db.QueryRowContext(ctx, insertXpAward,
+func (q *Queries) InsertXpAward(ctx context.Context, arg InsertXpAwardParams) error {
+	_, err := q.db.ExecContext(ctx, insertXpAward,
 		arg.XpAward,
 		arg.XpAwardWithBonus,
 		arg.Reason,
 		arg.CharacterID,
 	)
-	var i XpAward
-	err := row.Scan(
-		&i.ID,
-		&i.XpAward,
-		&i.XpAwardWithBonus,
-		&i.Reason,
-		&i.CharacterID,
-		&i.CreateDatetime,
-	)
-	return i, err
+	return err
 }

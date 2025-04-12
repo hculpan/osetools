@@ -40,7 +40,7 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		character, err := dbutils.GetQueries().GetCharacterById(r.Context(), int64(id))
+		character, err := dbutils.GetQueries().GetCharacterById(r.Context(), int32(id))
 		if err != nil {
 			e := fmt.Errorf("error retrieving character with id of %d : %w", id, err)
 			slog.Error(e.Error())
@@ -51,11 +51,11 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 		xpBonus := float64(character.XpBonus) / 100
 		xp := int(float64(xpAward) * (1 + xpBonus))
 
-		_, err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
-			XpAward:          int64(xpAward),
-			XpAwardWithBonus: int64(xp),
+		err = dbutils.GetQueries().InsertXpAward(r.Context(), db.InsertXpAwardParams{
+			XpAward:          int32(xpAward),
+			XpAwardWithBonus: int32(xp),
 			Reason:           reason,
-			CharacterID:      character.ID.(int64),
+			CharacterID:      character.ID,
 		})
 		if err != nil {
 			e := fmt.Errorf("error saving xp award for character with id %d : %w", id, err)

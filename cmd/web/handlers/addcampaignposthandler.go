@@ -29,10 +29,10 @@ func AddCampaignPostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/campaigns", http.StatusSeeOther)
 	}
 
-	_, err = dbutils.GetQueries().InsertCampaign(r.Context(), db.InsertCampaignParams{
+	err = dbutils.GetQueries().InsertCampaign(r.Context(), db.InsertCampaignParams{
 		Name:        name,
 		Description: sql.NullString{String: description, Valid: true},
-		UserID:      user.ID.(int64),
+		UserID:      user.ID,
 		KeyField:    uuid.New().String(),
 	})
 	if err != nil {

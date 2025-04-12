@@ -10,7 +10,7 @@ import (
 templ CharacterTemplate(appTitle string,
 username string,
 authorized bool,
-character db.GetCharacterWithXpRow,
+character db.Character,
 xpBonusReasons []db.XpBonusReason,
 xpAwards []db.XpAward) {
 <!DOCTYPE html>
@@ -64,7 +64,7 @@ xpAwards []db.XpAward) {
             </div>
             <div class="h5 mt-5"><a href="#xpTotalCollapse" class="h5 mt-5 nav-anchor" style="text-decoration:none"
                     data-bs-toggle="collapse" role="button" aria-expanded="false">
-                    Total XP: { utils.FormatInt(int(character.TotalXp.Float64)) }
+                    Total XP: { utils.FormatInt(int(character.TotalXp)) }
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-chevron-down" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
@@ -101,7 +101,7 @@ xpAwards []db.XpAward) {
             </div>
             <hr>
             if authorized {
-            <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID.(int64))))
+            <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID)))
                 }>Delete</a>
             }
         </div>
