@@ -3,7 +3,7 @@ module github.com/hculpan/osetools
 go 1.24.0
 
 require (
-	github.com/a-h/templ v0.3.833
+	github.com/a-h/templ v0.3.857
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/golang-jwt/jwt/v4 v4.5.1

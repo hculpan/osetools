@@ -63,6 +63,15 @@ func AddXpPostHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, e.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		character.TotalXp += int32(xp)
+		err = dbutils.UpdateCharacter(r.Context(), character)
+		if err != nil {
+			e := fmt.Errorf("error saving xp award to character record with id %d : %w", id, err)
+			slog.Error(e.Error())
+			http.Error(w, e.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// Redirect to the welcome page upon successful login

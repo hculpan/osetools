@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 const deleteCharacter = `-- name: DeleteCharacter :exec
@@ -83,6 +82,7 @@ const getCharactersForCampaign = `-- name: GetCharactersForCampaign :many
 SELECT id, name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, dead, retainer FROM characters
 WHERE campaign_id = ?
   AND not dead
+ORDER by retainer, name
 `
 
 func (q *Queries) GetCharactersForCampaign(ctx context.Context, campaignID int32) ([]Character, error) {
@@ -179,16 +179,17 @@ func (q *Queries) GetLatestCharacterByID(ctx context.Context) (Character, error)
 }
 
 const insertCharacter = `-- name: InsertCharacter :exec
-INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime, total_xp)
-VALUES (?, ?, ?, ?, ?, now())
+INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, retainer)
+VALUES (?, ?, ?, ?, now(), ?, ?)
 `
 
 type InsertCharacterParams struct {
-	Name           string
-	PlayerName     string
-	XpBonus        int32
-	CampaignID     int32
-	CreateDatetime time.Time
+	Name       string
+	PlayerName string
+	XpBonus    int32
+	CampaignID int32
+	TotalXp    int32
+	Retainer   bool
 }
 
 func (q *Queries) InsertCharacter(ctx context.Context, arg InsertCharacterParams) error {
@@ -197,14 +198,15 @@ func (q *Queries) InsertCharacter(ctx context.Context, arg InsertCharacterParams
 		arg.PlayerName,
 		arg.XpBonus,
 		arg.CampaignID,
-		arg.CreateDatetime,
+		arg.TotalXp,
+		arg.Retainer,
 	)
 	return err
 }
 
 const updateCharacter = `-- name: UpdateCharacter :exec
 UPDATE characters 
-SET name = ?, player_name = ?, xp_bonus = ?, total_xp = ?
+SET name = ?, player_name = ?, xp_bonus = ?, total_xp = ?, dead = ?
 WHERE id = ?
 `
 
@@ -213,6 +215,7 @@ type UpdateCharacterParams struct {
 	PlayerName string
 	XpBonus    int32
 	TotalXp    int32
+	Dead       bool
 	ID         int32
 }
 
@@ -222,6 +225,7 @@ func (q *Queries) UpdateCharacter(ctx context.Context, arg UpdateCharacterParams
 		arg.PlayerName,
 		arg.XpBonus,
 		arg.TotalXp,
+		arg.Dead,
 		arg.ID,
 	)
 	return err

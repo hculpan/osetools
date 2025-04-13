@@ -39,6 +39,13 @@ func CharactersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comp := templates.XpTemplate(appTitle, auth.GetCurrentUsername(r), idNum, dbCampaign.Name, characters, authorized, msg)
+	deadCharacters, err := dbutils.GetQueries().GetDeadCharactersForCampaign(r.Context(), int32(idNum))
+	if err != nil {
+		slog.Error(fmt.Errorf("unable to retrieve characters for campaign id %d: %w", idNum, err).Error())
+		http.Error(w, fmt.Errorf("unable to retrieve characters for campaign id %d: %w", idNum, err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	comp := templates.XpTemplate(appTitle, auth.GetCurrentUsername(r), idNum, dbCampaign.Name, characters, authorized, msg, deadCharacters)
 	comp.Render(r.Context(), w)
 }

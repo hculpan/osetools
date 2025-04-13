@@ -10,7 +10,8 @@ import (
 templ XpTemplate(appTitle string, username string, campaignId int, campaignName string,
 characters []db.Character,
 authorized bool,
-msg string) {
+msg string,
+deadCharacters []db.Character) {
 <!DOCTYPE html>
 <html lang="en">
 
@@ -41,7 +42,11 @@ msg string) {
                     for _, c := range characters {
                     <tr>
                         <td><a href={ templ.SafeURL("/character/" + strconv.Itoa(int(c.ID))) }>{ c.Name }</a></td>
-                        <td>{ c.PlayerName }</td>
+                        if c.Retainer {
+                            <td>Retainer ({ c.PlayerName })</td>
+                        } else {
+                            <td>{ c.PlayerName }</td>
+                        }
                         <td class=" text-center">{ utils.FormatInt(int(c.XpBonus)) }%</td>
                         <td class=" text-center">{ utils.FormatInt(int(c.TotalXp)) }</td>
                     </tr>
@@ -59,7 +64,37 @@ msg string) {
             case "xp_awarded":
             <div class="text-center text-success mt-4">XP has been successfully awarded</div>
             }
-        </div>
+        
+           <div class="mt-5">
+                <details>
+                    <summary><strong>Dead Characters</strong></summary>
+                    <table class="table table-dark table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Player</th>
+                                <th class="text-center" scope="col">XP Bonus</th>
+                                <th class="text-center" scope="col">Total XP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            for _, deadChar := range deadCharacters {
+                                <tr>
+                                    <td><a href={ templ.SafeURL("/character/" + strconv.Itoa(int(deadChar.ID))) }>{ deadChar.Name }</a></td>
+                                    if deadChar.Retainer {
+                                        <td>Retainer ({ deadChar.PlayerName })</td>
+                                    } else {
+                                        <td>{ deadChar.PlayerName }</td>
+                                    }
+                                    <td class="text-center">{ utils.FormatInt(int(deadChar.XpBonus)) }</td>
+                                    <td class="text-center">{ utils.FormatInt(int(deadChar.TotalXp)) }</td>
+                                </tr>
+                            } 
+                        </tbody>
+                    </table>
+                </details>
+            </div>
+</div>
     </div>
 </body>
 

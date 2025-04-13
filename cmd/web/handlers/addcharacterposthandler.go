@@ -20,6 +20,7 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 	characterName := r.FormValue("characterName")
 	playerName := r.FormValue("playerName")
 	totalXpStr := r.FormValue("totalXp")
+	retainer := r.FormValue("retainer") == "1"
 
 	campaignId, err := strconv.Atoi(id)
 	if err != nil {
@@ -61,6 +62,7 @@ func AddCharacterPostHandler(w http.ResponseWriter, r *http.Request) {
 		PlayerName: playerName,
 		XpBonus:    int32(xpBonusTotal),
 		CampaignID: int32(campaignId),
+		Retainer:   retainer,
 	})
 	if err != nil {
 		slog.Error("error persisting character", "msg", err.Error())

@@ -101,8 +101,12 @@ xpAwards []db.XpAward) {
             </div>
             <hr>
             if authorized {
-            <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID)))
-                }>Delete</a>
+                if character.Dead {
+                    <a class="btn btn-primary" href={ templ.SafeURL("/raisecharacter/" + strconv.Itoa(int(character.ID)))}>Mark Alive</a>
+                } else {
+                    <a class="btn btn-primary" href={ templ.SafeURL("/killcharacter/" + strconv.Itoa(int(character.ID)))}>Mark Dead</a>
+                }
+                <a class="btn btn-primary" href={ templ.SafeURL("/deletecharacter/" + strconv.Itoa(int(character.ID)))}>Delete</a>
             }
         </div>
     </div>

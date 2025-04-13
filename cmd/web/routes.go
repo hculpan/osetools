@@ -26,6 +26,8 @@ func routes(router *chi.Mux) *chi.Mux {
 		router.Get("/add-character/{campaignId}", auth.AuthMiddleware(handlers.AddCharacterFormHandler))
 		router.Post("/add-character", auth.AuthMiddleware(handlers.AddCharacterPostHandler))
 		router.Get("/deletecharacter/{characterId}", auth.AuthMiddleware(handlers.DeleteCharacterHandler))
+		router.Get("/raisecharacter/{characterId}", auth.AuthMiddleware(handlers.RaiseCharacterHandler))
+		router.Get("/killcharacter/{characterId}", auth.AuthMiddleware(handlers.KillCharacterHandler))
 		router.Get("/add-campaign", auth.AuthMiddleware(handlers.AddCampaignHandler))
 		router.Post("/add-campaign", auth.AuthMiddleware(handlers.AddCampaignPostHandler))
 

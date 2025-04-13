@@ -1,6 +1,6 @@
 -- name: InsertCharacter :exec
-INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime, total_xp)
-VALUES (?, ?, ?, ?, ?, now());
+INSERT INTO characters (name, player_name, xp_bonus, campaign_id, create_datetime, total_xp, retainer)
+VALUES (?, ?, ?, ?, now(), ?, ?);
 
 -- name: GetLatestCharacterByID :one
 SELECT * FROM characters WHERE id = LAST_INSERT_ID();
@@ -8,7 +8,8 @@ SELECT * FROM characters WHERE id = LAST_INSERT_ID();
 -- name: GetCharactersForCampaign :many
 SELECT * FROM characters
 WHERE campaign_id = ?
-  AND not dead;
+  AND not dead
+ORDER by retainer, name;
 
 -- name: GetDeadCharactersForCampaign :many
 SELECT * FROM characters
@@ -24,7 +25,7 @@ DELETE FROM characters where id = ?;
 
 -- name: UpdateCharacter :exec
 UPDATE characters 
-SET name = ?, player_name = ?, xp_bonus = ?, total_xp = ?
+SET name = ?, player_name = ?, xp_bonus = ?, total_xp = ?, dead = ?
 WHERE id = ?;
 
 -- name: GetAllCharacters :many
